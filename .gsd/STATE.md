@@ -1,19 +1,19 @@
 # Active Project State (Anti-Context-Rot Ledger)
 
 ## Active Task
-- **ID:** `TASK-007`
-- **Title:** Rate Limiting & Abuse Prevention Middleware
-- **Category:** security
+- **ID:** `TASK-008`
+- **Title:** Automated Code Review Gate (CodeRabbit Sim)
+- **Category:** quality
 - **Status:** In Progress
 
 ## Last Verified Checkpoint
-- **Timestamp:** 2026-10-30T16:27:09.911Z
-- **Progress:** 6 / 8 tasks completed (75%)
+- **Timestamp:** 2026-10-30T16:28:09.809Z
+- **Progress:** 7 / 8 tasks completed (88%)
 
 ## Progress Summary
-- Completed: 6
-- Pending: 2
+- Completed: 7
+- Pending: 1
 - Active Milestone: Phase 4: Hardening & Testing
 
 ## Next Recommended Actions
-Implement acceptance criteria for **Rate Limiting & Abuse Prevention Middleware** and run backpressure check.
+Implement acceptance criteria for **Automated Code Review Gate (CodeRabbit Sim)** and run backpressure check.
