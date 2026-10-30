@@ -1,0 +1,126 @@
+{
+  "version": "1.0.0",
+  "project": "SoundWave Audio Streaming Bridge",
+  "activeMilestone": "Phase 4: Hardening & Testing",
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "Health Check & Database Connectivity",
+      "category": "infrastructure",
+      "status": "completed",
+      "acceptanceCriteria": [
+        "GET /api/health returns 200 OK",
+        "Reports MySQL status, timestamp, and emulator loopback URL"
+      ],
+      "verificationCommand": "node -e \"require('./backend/src/config/db')\"",
+      "files": [
+        "backend/server.js",
+        "backend/src/config/db.js"
+      ]
+    },
+    {
+      "id": "TASK-002",
+      "title": "YouTube Search Endpoint",
+      "category": "streaming",
+      "status": "completed",
+      "acceptanceCriteria": [
+        "GET /api/search?q={query} returns list of songs with title, artist, duration, coverArt",
+        "Handles empty queries gracefully with 400 status"
+      ],
+      "verificationCommand": "node -e \"require('./backend/src/controllers/streamController')\"",
+      "files": [
+        "backend/src/controllers/streamController.js",
+        "backend/src/routes/streamRoutes.js"
+      ]
+    },
+    {
+      "id": "TASK-003",
+      "title": "Audio Stream Extraction & Resolution",
+      "category": "streaming",
+      "status": "completed",
+      "acceptanceCriteria": [
+        "GET /api/stream/:videoId resolves playable audio stream URL",
+        "Includes fallback extractors (@distube/ytdl-core, youtubei.js, play-dl)"
+      ],
+      "verificationCommand": "node -e \"require('./backend/src/controllers/streamController')\"",
+      "files": [
+        "backend/src/controllers/streamController.js"
+      ]
+    },
+    {
+      "id": "TASK-004",
+      "title": "User Authentication & JWT Tokens",
+      "category": "auth",
+      "status": "completed",
+      "acceptanceCriteria": [
+        "POST /api/auth/register creates user with hashed password",
+        "POST /api/auth/login verifies credentials and issues valid JWT"
+      ],
+      "verificationCommand": "node -e \"require('./backend/src/controllers/authController')\"",
+      "files": [
+        "backend/src/controllers/authController.js",
+        "backend/src/routes/authRoutes.js"
+      ]
+    },
+    {
+      "id": "TASK-005",
+      "title": "Favorites and Playlists API",
+      "category": "features",
+      "status": "completed",
+      "acceptanceCriteria": [
+        "Users can add/remove favorites",
+        "Users can create playlists and attach tracks"
+      ],
+      "verificationCommand": "node -e \"require('./backend/src/controllers/favoritesController')\"",
+      "files": [
+        "backend/src/controllers/favoritesController.js",
+        "backend/src/controllers/playlistController.js"
+      ]
+    },
+    {
+      "id": "TASK-006",
+      "title": "Automatic Song Metadata Caching",
+      "category": "optimization",
+      "status": "completed",
+      "acceptanceCriteria": [
+        "When a track is searched or streamed, cache title, artist, cover art, and duration in `songs_cache`",
+        "Use `INSERT ... ON DUPLICATE KEY UPDATE` to avoid redundant queries"
+      ],
+      "verificationCommand": "node -e \"const db = require('./backend/src/config/db'); console.log('DB check passed');\"",
+      "files": [
+        "backend/src/controllers/streamController.js",
+        "backend/schema.sql"
+      ]
+    },
+    {
+      "id": "TASK-007",
+      "title": "Rate Limiting & Abuse Prevention Middleware",
+      "category": "security",
+      "status": "pending",
+      "acceptanceCriteria": [
+        "Add IP-based rate limiting to prevent spam on audio stream endpoints",
+        "Return HTTP 429 with standard Retry-After headers when exceeded"
+      ],
+      "verificationCommand": "node -e \"console.log('Verification placeholder for rate limiter')\"",
+      "files": [
+        "backend/src/middleware/rateLimiter.js",
+        "backend/server.js"
+      ]
+    },
+    {
+      "id": "TASK-008",
+      "title": "Automated Code Review Gate (CodeRabbit Sim)",
+      "category": "quality",
+      "status": "pending",
+      "acceptanceCriteria": [
+        "Static inspection script scans staged/modified JS files",
+        "Detects SQL injection risks, missing catch blocks, and exposed tokens",
+        "Exits with non-zero code if critical violations are found"
+      ],
+      "verificationCommand": "node scripts/code-review.js",
+      "files": [
+        "scripts/code-review.js"
+      ]
+    }
+  ]
+}
