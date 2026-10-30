@@ -1,11 +1,7 @@
 /**
  * SoundWave Mobile API Client Bridge
- * Supports Android Emulator loopback (10.0.2.2:3000), physical devices, and web.
+ * Supports Android Emulator loopback (10.0.2.2:3000), physical devices (localhost via ADB reverse), and network IP.
  */
-
-const http = require('http');
-const https = require('https');
-const { URL } = require('url');
 
 class SoundWaveApiClient {
   /**
@@ -14,8 +10,8 @@ class SoundWaveApiClient {
    * @param {string} [config.authToken]
    */
   constructor(config = {}) {
-    // Default to localhost, with option to switch to 10.0.2.2 for Android emulator
-    this.baseUrl = config.baseUrl || process.env.SOUNDWAVE_API_URL || 'http://127.0.0.1:3000';
+    // Default to localhost:3000 (connected device with adb reverse tcp:3000 tcp:3000)
+    this.baseUrl = config.baseUrl || 'http://127.0.0.1:3000';
     this.authToken = config.authToken || null;
   }
 
@@ -28,13 +24,13 @@ class SoundWaveApiClient {
   }
 
   /**
-   * Low-level HTTP request helper
+   * Low-level HTTP request helper using standard fetch
    * @private
    */
   async _request(endpoint, { method = 'GET', body = null, headers = {} } = {}) {
-    const fullUrl = new URL(endpoint, this.baseUrl);
-    const isHttps = fullUrl.protocol === 'https:';
-    const transport = isHttps ? https : http;
+    const cleanBase = this.baseUrl.replace(/\/+$/, '');
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${cleanBase}${cleanEndpoint}`;
 
     const requestHeaders = {
       'Content-Type': 'application/json',
@@ -46,53 +42,33 @@ class SoundWaveApiClient {
       requestHeaders['Authorization'] = `Bearer ${this.authToken}`;
     }
 
-    const payload = body ? JSON.stringify(body) : null;
-    if (payload) {
-      requestHeaders['Content-Length'] = Buffer.byteLength(payload);
-    }
-
     const options = {
-      hostname: fullUrl.hostname,
-      port: fullUrl.port || (isHttps ? 443 : 80),
-      path: `${fullUrl.pathname}${fullUrl.search}`,
       method,
       headers: requestHeaders,
     };
 
-    return new Promise((resolve, reject) => {
-      const req = transport.request(options, (res) => {
-        let rawData = '';
-        res.on('data', (chunk) => {
-          rawData += chunk;
-        });
-        res.on('end', () => {
-          try {
-            const parsed = rawData ? JSON.parse(rawData) : {};
-            if (res.statusCode >= 200 && res.statusCode < 300) {
-              resolve(parsed);
-            } else {
-              const err = new Error(parsed.error || `HTTP ${res.statusCode}`);
-              err.status = res.statusCode;
-              err.data = parsed;
-              reject(err);
-            }
-          } catch (e) {
-            if (res.statusCode >= 200 && res.statusCode < 300) {
-              resolve(rawData);
-            } else {
-              reject(new Error(`HTTP ${res.statusCode}: ${rawData}`));
-            }
-          }
-        });
-      });
+    if (body && method !== 'GET' && method !== 'HEAD') {
+      options.body = JSON.stringify(body);
+    }
 
-      req.on('error', (err) => reject(err));
+    const response = await fetch(url, options);
+    const contentType = response.headers.get('content-type') || '';
 
-      if (payload) {
-        req.write(payload);
-      }
-      req.end();
-    });
+    let data;
+    if (contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+
+    if (!response.ok) {
+      const err = new Error(data && data.error ? data.error : `HTTP ${response.status}`);
+      err.status = response.status;
+      err.data = data;
+      throw err;
+    }
+
+    return data;
   }
 
   // --- API Methods ---
@@ -114,7 +90,7 @@ class SoundWaveApiClient {
       method: 'POST',
       body: { username, email, password },
     });
-    if (res.token) {
+    if (res && res.token) {
       this.setToken(res.token);
     }
     return res;
@@ -125,7 +101,7 @@ class SoundWaveApiClient {
       method: 'POST',
       body: { username, password },
     });
-    if (res.token) {
+    if (res && res.token) {
       this.setToken(res.token);
     }
     return res;
@@ -192,4 +168,3 @@ module.exports = {
   SoundWaveApiClient,
   api: defaultClient,
 };
-
