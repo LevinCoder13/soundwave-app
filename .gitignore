@@ -11,5 +11,7 @@ Thumbs.db
 # Android build outputs and caches
 mobile/android/.gradle/
 mobile/android/app/build/
+mobile/android/build/
 mobile/android/app/.cxx/
 *.png
+*.apk

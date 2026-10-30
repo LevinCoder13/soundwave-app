@@ -1,6 +1,7 @@
 /**
  * SoundWave Mobile API Client Bridge
- * Supports Android Emulator loopback (10.0.2.2:3000), physical devices (localhost via ADB reverse), and network IP.
+ * Supports Wi-Fi Direct LAN (192.168.1.13:3000), USB ADB reverse (127.0.0.1:3000),
+ * and Android Emulator loopback (10.0.2.2:3000).
  */
 
 class SoundWaveApiClient {
@@ -10,8 +11,13 @@ class SoundWaveApiClient {
    * @param {string} [config.authToken]
    */
   constructor(config = {}) {
-    // Default to localhost:3000 (connected device with adb reverse tcp:3000 tcp:3000)
-    this.baseUrl = config.baseUrl || 'http://127.0.0.1:3000';
+    // Default to the Wi-Fi LAN IP so the phone works completely untethered without USB
+    this.baseUrl = config.baseUrl || 'http://192.168.1.13:3000';
+    this.fallbackUrls = [
+      'http://192.168.1.13:3000',
+      'http://127.0.0.1:3000',
+      'http://10.0.2.2:3000',
+    ];
     this.authToken = config.authToken || null;
   }
 
@@ -20,7 +26,38 @@ class SoundWaveApiClient {
   }
 
   setBaseUrl(url) {
-    this.baseUrl = url;
+    if (url) {
+      this.baseUrl = url.replace(/\/+$/, '');
+    }
+  }
+
+  getBaseUrl() {
+    return this.baseUrl;
+  }
+
+  /**
+   * Automatically discovers the fastest working backend address
+   */
+  async autoDetectHost() {
+    for (const host of this.fallbackUrls) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1200);
+        const res = await fetch(`${host}/api/health`, {
+          signal: controller.signal,
+          headers: { Accept: 'application/json' },
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          this.baseUrl = host;
+          console.log(`[SoundWave Client] Connected to backend at: ${host}`);
+          return host;
+        }
+      } catch (err) {
+        // try next
+      }
+    }
+    return this.baseUrl;
   }
 
   /**
@@ -51,24 +88,32 @@ class SoundWaveApiClient {
       options.body = JSON.stringify(body);
     }
 
-    const response = await fetch(url, options);
-    const contentType = response.headers.get('content-type') || '';
+    try {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
 
-    let data;
-    if (contentType.includes('application/json')) {
-      data = await response.json();
-    } else {
-      data = await response.text();
+      let data;
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
+
+      if (!response.ok) {
+        const err = new Error(data && data.error ? data.error : `HTTP ${response.status}`);
+        err.status = response.status;
+        err.data = data;
+        throw err;
+      }
+
+      return data;
+    } catch (error) {
+      // If primary network fails, try health check and auto-detect
+      if (error.message && error.message.includes('Network request failed')) {
+        await this.autoDetectHost();
+      }
+      throw error;
     }
-
-    if (!response.ok) {
-      const err = new Error(data && data.error ? data.error : `HTTP ${response.status}`);
-      err.status = response.status;
-      err.data = data;
-      throw err;
-    }
-
-    return data;
   }
 
   // --- API Methods ---
@@ -77,6 +122,20 @@ class SoundWaveApiClient {
     return this._request('/api/health');
   }
 
+  // --- Browse & Curated Feed ---
+  async getFeaturedFeed() {
+    return this._request('/api/browse/featured');
+  }
+
+  async getCategories() {
+    return this._request('/api/browse/categories');
+  }
+
+  async getLyrics(trackId, title = '', artist = '') {
+    return this._request(`/api/browse/lyrics/${encodeURIComponent(trackId)}?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`);
+  }
+
+  // --- Search & Streaming ---
   async searchTracks(query) {
     return this._request(`/api/search?q=${encodeURIComponent(query)}`);
   }
@@ -85,6 +144,7 @@ class SoundWaveApiClient {
     return this._request(`/api/stream/${encodeURIComponent(videoId)}`);
   }
 
+  // --- Auth ---
   async register(username, email, password) {
     const res = await this._request('/api/auth/register', {
       method: 'POST',
@@ -107,6 +167,7 @@ class SoundWaveApiClient {
     return res;
   }
 
+  // --- Favorites ---
   async getFavorites() {
     return this._request('/api/favorites');
   }
@@ -123,6 +184,7 @@ class SoundWaveApiClient {
     });
   }
 
+  // --- Playlists ---
   async getPlaylists() {
     return this._request('/api/playlists');
   }

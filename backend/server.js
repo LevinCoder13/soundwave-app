@@ -12,6 +12,7 @@ const streamRoutes = require('./src/routes/streamRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const favoritesRoutes = require('./src/routes/favoritesRoutes');
 const playlistRoutes = require('./src/routes/playlistRoutes');
+const browseRoutes = require('./src/routes/browseRoutes');
 
 const app = express();
 const PORT = parseInt(process.env.PORT, 10) || 3000;
@@ -73,6 +74,7 @@ app.use('/api', streamRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/playlists', playlistRoutes);
+app.use('/api/browse', browseRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
