@@ -157,7 +157,7 @@
       "id": "TASK-011",
       "title": "Spotify-Class MiniPlayer & UI Components",
       "category": "ui",
-      "status": "pending",
+      "status": "completed",
       "acceptanceCriteria": [
         "Implements MiniPlayer component styled with Spotify dark theme",
         "Displays track thumbnail, title, artist, and playback control buttons",
