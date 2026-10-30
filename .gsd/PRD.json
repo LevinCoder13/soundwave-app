@@ -1,7 +1,7 @@
 {
-  "version": "1.0.0",
-  "project": "SoundWave Audio Streaming Bridge",
-  "activeMilestone": "Phase 4: Hardening & Testing",
+  "version": "1.1.0",
+  "project": "SoundWave Spotify-Class Audio Engine",
+  "activeMilestone": "Phase 5: React Native Mobile Client & Player Architecture",
   "tasks": [
     {
       "id": "TASK-001",
@@ -40,7 +40,7 @@
       "status": "completed",
       "acceptanceCriteria": [
         "GET /api/stream/:videoId resolves playable audio stream URL",
-        "Includes fallback extractors (@distube/ytdl-core, youtubei.js, play-dl)"
+        "Upgraded to @distube/ytdl-core 5.2.0 with proper audio format matcher"
       ],
       "verificationCommand": "node -e \"require('./backend/src/controllers/streamController')\"",
       "files": [
@@ -83,8 +83,8 @@
       "category": "optimization",
       "status": "completed",
       "acceptanceCriteria": [
-        "When a track is searched or streamed, cache title, artist, cover art, and duration in `songs_cache`",
-        "Use `INSERT ... ON DUPLICATE KEY UPDATE` to avoid redundant queries"
+        "When a track is searched or streamed, cache title, artist, cover art, and duration in songs_cache",
+        "Use INSERT ... ON DUPLICATE KEY UPDATE to avoid redundant queries"
       ],
       "verificationCommand": "node -e \"const db = require('./backend/src/config/db'); console.log('DB check passed');\"",
       "files": [
@@ -120,6 +120,66 @@
       "verificationCommand": "node scripts/code-review.js",
       "files": [
         "scripts/code-review.js"
+      ]
+    },
+    {
+      "id": "TASK-009",
+      "title": "Mobile API Client & Network Bridge",
+      "category": "mobile",
+      "status": "completed",
+      "acceptanceCriteria": [
+        "Creates mobile API client supporting Android loopback (10.0.2.2:3000) and localhost",
+        "Implements typed wrappers for search, stream resolution, auth, and favorites",
+        "Exports reusable Axios service"
+      ],
+      "verificationCommand": "node -e \"require('./mobile/src/api/client')\"",
+      "files": [
+        "mobile/src/api/client.js",
+        "mobile/src/types/index.js"
+      ]
+    },
+    {
+      "id": "TASK-010",
+      "title": "Zustand Audio State Store & Stream Pipeline",
+      "category": "mobile",
+      "status": "pending",
+      "acceptanceCriteria": [
+        "Creates Zustand-based audio store managing playback queue, current track, and status",
+        "Integrates stream URL resolution before playback transition",
+        "Handles play, pause, next, previous, and toggleFavorite actions"
+      ],
+      "verificationCommand": "node -e \"require('./mobile/src/store/playerStore')\"",
+      "files": [
+        "mobile/src/store/playerStore.js"
+      ]
+    },
+    {
+      "id": "TASK-011",
+      "title": "Spotify-Class MiniPlayer & UI Components",
+      "category": "ui",
+      "status": "pending",
+      "acceptanceCriteria": [
+        "Implements MiniPlayer component styled with Spotify dark theme",
+        "Displays track thumbnail, title, artist, and playback control buttons",
+        "Includes full player modal view with scrubber"
+      ],
+      "verificationCommand": "node -e \"require('./mobile/src/components/MiniPlayer')\"",
+      "files": [
+        "mobile/src/components/MiniPlayer.js"
+      ]
+    },
+    {
+      "id": "TASK-012",
+      "title": "Full-Stack End-to-End System Validation",
+      "category": "testing",
+      "status": "pending",
+      "acceptanceCriteria": [
+        "Executes complete pipeline: search track -> resolve stream -> cache metadata -> add favorite",
+        "Verifies Android emulator loopback configuration"
+      ],
+      "verificationCommand": "node backend/scripts/testEndpoints.js",
+      "files": [
+        "backend/scripts/testEndpoints.js"
       ]
     }
   ]
