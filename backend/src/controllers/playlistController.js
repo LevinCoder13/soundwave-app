@@ -170,10 +170,74 @@ async function removeTrackFromPlaylist(req, res) {
   }
 }
 
+/**
+ * Update playlist title
+ * PATCH /api/playlists/:id
+ */
+async function updatePlaylist(req, res) {
+  try {
+    const userId = req.user.id;
+    const playlistId = req.params.id;
+    const { title } = req.body;
+
+    if (!title || title.trim() === '') {
+      return res.status(400).json({ error: 'Playlist title is required' });
+    }
+
+    const [result] = await pool.query(
+      'UPDATE playlists SET title = ? WHERE id = ? AND user_id = ?',
+      [title.trim(), playlistId, userId]
+    );
+
+    if (result.matchedRows === 0) {
+      return res.status(404).json({ error: 'Playlist not found or unauthorized' });
+    }
+
+    return res.json({
+      message: 'Playlist updated successfully',
+      playlistId: parseInt(playlistId, 10),
+      title: title.trim(),
+    });
+  } catch (err) {
+    console.error('[Update Playlist Error]:', err.message);
+    return res.status(500).json({ error: 'Failed to update playlist', details: err.message });
+  }
+}
+
+/**
+ * Delete a playlist
+ * DELETE /api/playlists/:id
+ */
+async function deletePlaylist(req, res) {
+  try {
+    const userId = req.user.id;
+    const playlistId = req.params.id;
+
+    const [result] = await pool.query(
+      'DELETE FROM playlists WHERE id = ? AND user_id = ?',
+      [playlistId, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Playlist not found or unauthorized' });
+    }
+
+    return res.json({
+      message: 'Playlist deleted successfully',
+      playlistId: parseInt(playlistId, 10),
+    });
+  } catch (err) {
+    console.error('[Delete Playlist Error]:', err.message);
+    return res.status(500).json({ error: 'Failed to delete playlist', details: err.message });
+  }
+}
+
 module.exports = {
   getUserPlaylists,
   createPlaylist,
   getPlaylistById,
+  updatePlaylist,
+  deletePlaylist,
   addTrackToPlaylist,
   removeTrackFromPlaylist,
 };

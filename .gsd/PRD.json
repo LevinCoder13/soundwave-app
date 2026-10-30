@@ -1,7 +1,7 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "project": "SoundWave Spotify-Class Audio Engine",
-  "activeMilestone": "Phase 5: React Native Mobile Client & Player Architecture",
+  "activeMilestone": "Phase 6: Production Completeness & Full Stack Delivery",
   "tasks": [
     {
       "id": "TASK-001",
@@ -180,6 +180,56 @@
       "verificationCommand": "node backend/scripts/testEndpoints.js",
       "files": [
         "backend/scripts/testEndpoints.js"
+      ]
+    },
+    {
+      "id": "TASK-013",
+      "title": "Complete Playlist CRUD Endpoints",
+      "category": "features",
+      "status": "completed",
+      "acceptanceCriteria": [
+        "Implements PATCH /api/playlists/:id for updating playlist title",
+        "Implements DELETE /api/playlists/:id for removing playlist"
+      ],
+      "verificationCommand": "node -e \"require('./backend/src/controllers/playlistController')\"",
+      "files": [
+        "backend/src/controllers/playlistController.js",
+        "backend/src/routes/playlistRoutes.js"
+      ]
+    },
+    {
+      "id": "TASK-014",
+      "title": "Mobile Screens & NativeWind Application Shell",
+      "category": "mobile",
+      "status": "completed",
+      "acceptanceCriteria": [
+        "Implements SearchScreen, LibraryScreen, and AuthScreen controllers",
+        "Implements App root shell with navigation and persistent MiniPlayer",
+        "Includes NativeWind / Tailwind configuration and background service"
+      ],
+      "verificationCommand": "node mobile/testMobile.js",
+      "files": [
+        "mobile/App.js",
+        "mobile/service.js",
+        "mobile/tailwind.config.js",
+        "mobile/src/screens/SearchScreen.js",
+        "mobile/src/screens/LibraryScreen.js",
+        "mobile/src/screens/AuthScreen.js"
+      ]
+    },
+    {
+      "id": "TASK-015",
+      "title": "Comprehensive 16-Stage Backend & Mobile Integration Suite",
+      "category": "testing",
+      "status": "completed",
+      "acceptanceCriteria": [
+        "16 automated checks with strict assertion tests",
+        "Passes 100% with live WampServer MySQL and YouTube stream extraction"
+      ],
+      "verificationCommand": "node backend/scripts/testEndpoints.js",
+      "files": [
+        "backend/scripts/testEndpoints.js",
+        "mobile/testMobile.js"
       ]
     }
   ]

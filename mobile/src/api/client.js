@@ -15,7 +15,7 @@ class SoundWaveApiClient {
    */
   constructor(config = {}) {
     // Default to localhost, with option to switch to 10.0.2.2 for Android emulator
-    this.baseUrl = config.baseUrl || process.env.SOUNDWAVE_API_URL || 'http://localhost:3000';
+    this.baseUrl = config.baseUrl || process.env.SOUNDWAVE_API_URL || 'http://127.0.0.1:3000';
     this.authToken = config.authToken || null;
   }
 
@@ -110,10 +110,14 @@ class SoundWaveApiClient {
   }
 
   async register(username, email, password) {
-    return this._request('/api/auth/register', {
+    const res = await this._request('/api/auth/register', {
       method: 'POST',
       body: { username, email, password },
     });
+    if (res.token) {
+      this.setToken(res.token);
+    }
+    return res;
   }
 
   async login(username, password) {
@@ -154,10 +158,29 @@ class SoundWaveApiClient {
     });
   }
 
+  async updatePlaylist(playlistId, title) {
+    return this._request(`/api/playlists/${playlistId}`, {
+      method: 'PATCH',
+      body: { title },
+    });
+  }
+
+  async deletePlaylist(playlistId) {
+    return this._request(`/api/playlists/${playlistId}`, {
+      method: 'DELETE',
+    });
+  }
+
   async addTrackToPlaylist(playlistId, songId) {
     return this._request(`/api/playlists/${playlistId}/tracks`, {
       method: 'POST',
       body: { songId },
+    });
+  }
+
+  async removeTrackFromPlaylist(playlistId, songId) {
+    return this._request(`/api/playlists/${playlistId}/tracks/${songId}`, {
+      method: 'DELETE',
     });
   }
 }
@@ -169,3 +192,4 @@ module.exports = {
   SoundWaveApiClient,
   api: defaultClient,
 };
+

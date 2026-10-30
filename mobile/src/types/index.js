@@ -35,3 +35,4 @@ module.exports = {
   DEFAULT_EMULATOR_URL: 'http://10.0.2.2:3000',
   DEFAULT_LOCAL_URL: 'http://localhost:3000',
 };
+

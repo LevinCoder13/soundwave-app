@@ -11,11 +11,12 @@
 - [x] User registration with bcrypt hashing (`POST /api/auth/register`).
 - [x] User login returning JWT tokens (`POST /api/auth/login`).
 - [x] Auth verification middleware (`src/middleware/authMiddleware.js`).
-- [x] Favorites management (`GET /api/favorites`, `POST /api/favorites/:songId`, `DELETE /api/favorites/:songId`).
+- [x] User profile endpoint (`GET /api/auth/me`).
+- [x] Favorites management (`GET /api/favorites`, `POST /api/favorites`, `DELETE /api/favorites/:songId`, `GET /api/favorites/check/:songId`).
 
 ## Phase 3: Playlist System & Song Metadata Cache (COMPLETED)
-- [x] Playlist CRUD endpoints (`GET /api/playlists`, `POST /api/playlists`, `DELETE /api/playlists/:id`).
-- [x] Playlist tracks junction management (`POST /api/playlists/:id/tracks`).
+- [x] Playlist CRUD endpoints (`GET /api/playlists`, `POST /api/playlists`, `PATCH /api/playlists/:id`, `DELETE /api/playlists/:id`).
+- [x] Playlist tracks junction management (`POST /api/playlists/:id/tracks`, `DELETE /api/playlists/:id/tracks/:songId`).
 - [x] Automated metadata caching in `songs_cache` on search and stream resolution (`streamController.js`).
 
 ## Phase 4: Production Hardening, Quality Gates & Autonomous Harness (COMPLETED)
@@ -25,9 +26,18 @@
 - [x] Rate-limiting middleware for search & streaming endpoints (`rateLimiter.js`).
 - [x] Ytdl-core 5.2.0 upgrade resolving live audio stream URL generation.
 
-## Phase 5: React Native Mobile Client & Player Architecture (ACTIVE)
-- [ ] React Native project architecture, types, and theme configuration (`mobile/`).
-- [ ] SoundWave API client bridge supporting Android emulator (`10.0.2.2:3000`) and local Wi-Fi.
-- [ ] Zustand audio state store managing current track, queue, playback state, and stream resolution.
-- [ ] Spotify-class MiniPlayer UI component (`src/components/MiniPlayer.tsx`) styled with NativeWind / Tailwind.
-- [ ] Search & Library screens for browsing songs, streaming audio, and saving favorites.
+## Phase 5: React Native Mobile Client & Player Architecture (COMPLETED)
+- [x] React Native project architecture, types, and theme configuration (`mobile/`).
+- [x] SoundWave API client bridge supporting Android emulator (`10.0.2.2:3000`) and local Wi-Fi.
+- [x] Zustand audio state store managing current track, queue, playback state, and stream resolution.
+- [x] Spotify-class MiniPlayer UI component (`src/components/MiniPlayer.js`) styled with NativeWind / Tailwind.
+- [x] Spotify-class FullPlayer modal view (`src/components/MiniPlayer.js`).
+
+## Phase 6: Screens, Shell & End-to-End Test Suite (COMPLETED)
+- [x] SearchScreen controller with live queries & debouncing (`mobile/src/screens/SearchScreen.js`).
+- [x] LibraryScreen controller managing playlists and favorited tracks (`mobile/src/screens/LibraryScreen.js`).
+- [x] AuthScreen controller with login/register and token management (`mobile/src/screens/AuthScreen.js`).
+- [x] Mobile App shell (`mobile/App.js`) unifying navigation tabs and bottom MiniPlayer.
+- [x] NativeWind configuration (`mobile/tailwind.config.js`) & background audio service (`mobile/service.js`).
+- [x] 16-stage backend integration test suite (`backend/scripts/testEndpoints.js`) passing 100%.
+- [x] 7-stage mobile integration test suite (`mobile/testMobile.js`) passing 100%.
