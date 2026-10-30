@@ -163,3 +163,4 @@ switch (command) {
     console.log('Available commands: status, next-prompt, verify, complete');
     process.exit(1);
 }
+

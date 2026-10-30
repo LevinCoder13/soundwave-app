@@ -9,7 +9,7 @@
     "db:init": "node scripts/initDb.js"
   },
   "dependencies": {
-    "@distube/ytdl-core": "^4.16.12",
+    "@distube/ytdl-core": "^5.2.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

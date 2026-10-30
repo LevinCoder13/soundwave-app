@@ -25,3 +25,4 @@
 - [x] CodeRabbit-style static security and quality gate (`scripts/code-review.js`).
 - [ ] Rate-limiting middleware for search & streaming endpoints.
 - [ ] Automated integration test runner with mock database fallback.
+

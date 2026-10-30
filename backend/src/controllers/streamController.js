@@ -1,6 +1,16 @@
-const ytdl = require('@distube/ytdl-core');
+const { Ytdl, chooseFormat } = require('@distube/ytdl-core');
 const yts = require('yt-search');
 const { pool } = require('../config/db');
+
+// Instantiate singleton Ytdl instance
+const ytdl = new Ytdl();
+
+// YouTube 11-character video ID regex
+const YOUTUBE_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
+
+function isValidVideoId(id) {
+  return typeof id === 'string' && YOUTUBE_ID_REGEX.test(id);
+}
 
 /**
  * Search tracks using yt-search
@@ -45,22 +55,21 @@ async function getStreamUrl(req, res) {
       return res.status(400).json({ error: 'videoId parameter is required' });
     }
 
-    // Validate YouTube video ID format
-    if (!ytdl.validateID(videoId)) {
+    if (!isValidVideoId(videoId)) {
       return res.status(400).json({ error: 'Invalid YouTube video ID format' });
     }
 
     const info = await ytdl.getInfo(videoId);
 
-    // Pick highest quality audio-only stream
+    // Pick highest quality audio stream
     let format = null;
     try {
-      format = ytdl.chooseFormat(info.formats, {
+      format = chooseFormat(info.formats, {
         quality: 'highestaudio',
-        filter: 'audioonly',
+        filter: { hasAudio: true, hasVideo: false },
       });
     } catch (e) {
-      // Fallback to any format with audio if pure audio-only is not available
+      // Fallback to any format with audio
       const audioFormats = info.formats.filter((f) => f.hasAudio);
       if (audioFormats.length > 0) {
         format = audioFormats[0];
@@ -118,17 +127,16 @@ async function getStreamUrl(req, res) {
 async function pipeAudioStream(req, res) {
   try {
     const { videoId } = req.params;
-    if (!ytdl.validateID(videoId)) {
+    if (!isValidVideoId(videoId)) {
       return res.status(400).json({ error: 'Invalid YouTube video ID format' });
     }
 
     res.header('Content-Type', 'audio/webm');
     res.header('Accept-Ranges', 'bytes');
 
-    const audioStream = ytdl(videoId, {
-      filter: 'audioonly',
+    const audioStream = await ytdl.download(videoId, {
       quality: 'highestaudio',
-      highWaterMark: 1 << 25,
+      filter: { hasAudio: true, hasVideo: false },
     });
 
     audioStream.on('error', (streamErr) => {

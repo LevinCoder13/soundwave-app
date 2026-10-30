@@ -15,3 +15,4 @@ SoundWave is a high-performance audio streaming backend and WampServer bridge bu
 2. **Deterministic Stream Error Handling:** Audio streams must always attach error listeners (`.on('error')`) to prevent unhandled stream crashes from taking down the Express process.
 3. **Emulator Compatibility:** All responses and URLs must correctly account for Android emulator network routing (`10.0.2.2` vs `localhost`).
 4. **Context Isolation:** Agents should execute one task at a time, check deterministic backpressure, update state, and commit atomically.
+

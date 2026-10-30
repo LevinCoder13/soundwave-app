@@ -37,3 +37,4 @@ while [ $iteration -lt $MAX_ITERATIONS ]; do
 done
 
 node scripts/ralph-manager.js status
+
