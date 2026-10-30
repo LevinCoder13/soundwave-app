@@ -111,7 +111,7 @@
       "id": "TASK-008",
       "title": "Automated Code Review Gate (CodeRabbit Sim)",
       "category": "quality",
-      "status": "pending",
+      "status": "completed",
       "acceptanceCriteria": [
         "Static inspection script scans staged/modified JS files",
         "Detects SQL injection risks, missing catch blocks, and exposed tokens",
