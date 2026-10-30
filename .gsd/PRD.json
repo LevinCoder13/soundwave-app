@@ -172,7 +172,7 @@
       "id": "TASK-012",
       "title": "Full-Stack End-to-End System Validation",
       "category": "testing",
-      "status": "pending",
+      "status": "completed",
       "acceptanceCriteria": [
         "Executes complete pipeline: search track -> resolve stream -> cache metadata -> add favorite",
         "Verifies Android emulator loopback configuration"
